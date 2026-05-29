@@ -10,7 +10,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Alpha Breezy" />
 <meta name="theme-color" content="#082E32" />
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -76,9 +75,14 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 }
 .field label small{font-weight:500;text-transform:none;letter-spacing:0;color:#a4b6b6}
 .input-wrap{position:relative}
-.input-wrap .dollar{
+.input-wrap .dollar, .input-wrap .x{
   position:absolute; left:14px; top:50%; transform:translateY(-50%);
   color:var(--teal); font-weight:700; font-size:16px; pointer-events:none;
+}
+.input-wrap .pct-suffix{
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  color:var(--muted); font-weight:600; font-size:12px; pointer-events:none;
+  letter-spacing:.04em;
 }
 .field input{
   width:100%; padding:13px 14px 13px 30px;
@@ -86,8 +90,14 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   border:2px solid var(--line); border-radius:13px; background:#fbfdfd;
   outline:none; transition:border-color .18s, box-shadow .18s;
 }
+.field input.with-suffix{padding-right:90px}
 .field input:hover{border-color:#cfe0e0}
 .field input:focus{border-color:var(--teal); background:#fff; box-shadow:0 0 0 4px rgba(27,107,112,.12)}
+
+.margin-field input{
+  border-color:#f0d98a; background:#fffbef;
+}
+.margin-field input:focus{border-color:var(--gold-d); box-shadow:0 0 0 4px rgba(232,184,75,.18)}
 
 .steps{
   margin:1.2rem 0 1rem; padding:1rem;
@@ -139,18 +149,31 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .price.card .val{color:var(--teal-d)}
 .price.card .sub{color:#a07f1c}
 
+.copy-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:1rem}
 .copy-btn{
-  display:flex; align-items:center; justify-content:center; gap:8px;
-  width:100%; margin-top:1rem; padding:13px;
-  font-family:inherit; font-size:13.5px; font-weight:700; letter-spacing:.02em;
-  color:#5a3d06; background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:13px 10px;
+  font-family:inherit; font-size:12.5px; font-weight:700; letter-spacing:.02em;
   border:none; border-radius:13px; cursor:pointer;
-  box-shadow:0 8px 18px -6px rgba(232,184,75,.7); transition:transform .15s, box-shadow .15s;
+  transition:transform .15s, box-shadow .15s;
   -webkit-tap-highlight-color:transparent;
+  text-align:center; line-height:1.15;
 }
-.copy-btn:hover{transform:translateY(-2px); box-shadow:0 12px 22px -6px rgba(232,184,75,.8)}
+.copy-btn:hover{transform:translateY(-2px)}
 .copy-btn:active{transform:translateY(0) scale(.99)}
-.copy-btn svg{width:15px;height:15px;flex:none}
+.copy-btn svg{width:14px;height:14px;flex:none}
+
+.copy-btn.cash{
+  color:#fff; background:linear-gradient(135deg,var(--teal),var(--teal-d));
+  box-shadow:0 8px 18px -6px rgba(14,74,79,.55);
+}
+.copy-btn.cash:hover{box-shadow:0 12px 22px -6px rgba(14,74,79,.7)}
+
+.copy-btn.card{
+  color:#5a3d06; background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  box-shadow:0 8px 18px -6px rgba(232,184,75,.7);
+}
+.copy-btn.card:hover{box-shadow:0 12px 22px -6px rgba(232,184,75,.85)}
 
 .foot{
   text-align:center; padding:.9rem; font-size:10px; color:#a4b6b6;
@@ -188,6 +211,13 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       <div class="input-wrap"><span class="dollar">$</span>
         <input type="number" id="labor" value="900" min="0" step="50" inputmode="decimal" /></div>
     </div>
+    <div class="field margin-field">
+      <label>Margem de lucro <small>(multiplicador)</small></label>
+      <div class="input-wrap"><span class="x">×</span>
+        <input type="number" id="margin" value="1.5" min="1" step="0.05" inputmode="decimal" class="with-suffix" />
+        <span class="pct-suffix" id="pctLabel">= 50% lucro</span>
+      </div>
+    </div>
 
     <div class="steps">
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">Equipamento + tax 7%</span></span><span class="v" id="r0">—</span></div>
@@ -198,7 +228,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       <div class="divider"></div>
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">+ labor</span></span><span class="v" id="r3">—</span></div>
       <div class="divider"></div>
-      <div class="row"><span class="k"><span class="dot"></span><span class="txt">× 1.5</span></span><span class="v" id="r4">—</span></div>
+      <div class="row"><span class="k"><span class="dot"></span><span class="txt" id="marginLabel">× margem</span></span><span class="v" id="r4">—</span></div>
     </div>
 
     <div class="results">
@@ -218,10 +248,16 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
     </div>
 
-    <button class="copy-btn" id="copyBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      <span id="copyLabel">Copiar os dois valores</span>
-    </button>
+    <div class="copy-row">
+      <button class="copy-btn cash" id="copyCashBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="copyCashLabel">Copiar à vista</span>
+      </button>
+      <button class="copy-btn card" id="copyCardBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="copyCardLabel">Copiar cartão</span>
+      </button>
+    </div>
   </div>
   <div class="foot">ALPHA BREEZY HEATING &amp; COOLING</div>
 </div>
@@ -232,11 +268,13 @@ function calc(){
   var e=parseFloat(document.getElementById('equip').value)||0;
   var m=parseFloat(document.getElementById('misc').value)||0;
   var l=parseFloat(document.getElementById('labor').value)||0;
+  var mg=parseFloat(document.getElementById('margin').value);
+  if(!mg||mg<1) mg=1;
   var s0=e*1.07;
   var s1=s0+m;
   var s2=s1*1.1;
   var s3=s2+l;
-  var cash=s3*1.5;
+  var cash=s3*mg;
   var card=cash*1.04;
   document.getElementById('r0').textContent=fmt(s0);
   document.getElementById('r1').textContent=fmt(s1);
@@ -245,14 +283,22 @@ function calc(){
   document.getElementById('r4').textContent=fmt(cash);
   document.getElementById('cashVal').textContent=fmt(cash);
   document.getElementById('cardVal').textContent=fmt(card);
+  var pct=Math.round((mg-1)*100);
+  document.getElementById('pctLabel').textContent='= '+pct+'% lucro';
+  document.getElementById('marginLabel').textContent='× '+mg.toFixed(2)+' (margem)';
 }
-['equip','misc','labor'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
-document.getElementById('copyBtn').addEventListener('click',function(){
-  var cash=document.getElementById('cashVal').textContent;
-  var card=document.getElementById('cardVal').textContent;
-  var txt='Zelle/Check/Cash: '+cash+'  |  Cartão: '+card;
-  navigator.clipboard.writeText(txt).then(function(){
-    var lab=document.getElementById('copyLabel'); var o=lab.textContent;
+['equip','misc','labor','margin'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+document.getElementById('copyCashBtn').addEventListener('click',function(){
+  var v=document.getElementById('cashVal').textContent;
+  navigator.clipboard.writeText(v).then(function(){
+    var lab=document.getElementById('copyCashLabel'); var o=lab.textContent;
+    lab.textContent='Copiado!'; setTimeout(function(){lab.textContent=o;},1500);
+  });
+});
+document.getElementById('copyCardBtn').addEventListener('click',function(){
+  var v=document.getElementById('cardVal').textContent;
+  navigator.clipboard.writeText(v).then(function(){
+    var lab=document.getElementById('copyCardLabel'); var o=lab.textContent;
     lab.textContent='Copiado!'; setTimeout(function(){lab.textContent=o;},1500);
   });
 });
