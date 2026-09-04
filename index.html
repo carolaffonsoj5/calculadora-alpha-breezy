@@ -241,6 +241,21 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .split-item .pctlbl{display:block; font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--muted); text-transform:uppercase}
 .split-item .pctval{display:block; margin-top:3px; font-weight:800; font-size:clamp(17px,4.6vw,20px); color:var(--teal-d); font-variant-numeric:tabular-nums}
 .split-cap{text-align:center; font-size:10px; color:#a4b6b6; margin-top:7px; letter-spacing:.05em; text-transform:uppercase}
+
+/* ---- Tipo de sistema: reutiliza estilo do select de marca ---- */
+
+/* ---- Card de lucro (interno) ---- */
+.profit{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-top:14px;
+  background:linear-gradient(135deg,#fff8ea,#fdedc8);
+  border:2px solid var(--gold); border-radius:16px;
+  padding:.85rem 1.1rem;
+}
+.profit-info{display:flex; flex-direction:column; gap:2px; min-width:0}
+.profit-lbl{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--teal-deep)}
+.profit-sub{font-size:11px; color:#9a8348; font-weight:600}
+.profit-val{font-size:clamp(22px,6vw,30px); font-weight:800; color:var(--teal-d); font-variant-numeric:tabular-nums; white-space:nowrap}
 </style>
 </head>
 <body>
@@ -266,6 +281,16 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
       <div class="input-wrap brand-other" id="brandOtherWrap">
         <input type="text" id="brandOther" placeholder="Escreva a marca" />
+      </div>
+    </div>
+    <div class="field">
+      <label>Tipo de sistema</label>
+      <div class="input-wrap">
+        <select id="system">
+          <option value="Mini Split">Mini Split</option>
+          <option value="Water Source">Water Source</option>
+          <option value="Split System">Split System</option>
+        </select>
       </div>
     </div>
     <div class="field">
@@ -323,6 +348,14 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
     </div>
 
+    <div class="profit">
+      <div class="profit-info">
+        <span class="profit-lbl">Seu lucro</span>
+        <span class="profit-sub" id="profitSub">—</span>
+      </div>
+      <div class="profit-val" id="profitVal">—</div>
+    </div>
+
     <div class="split">
       <div class="split-item">
         <span class="pctlbl">80%</span>
@@ -373,6 +406,13 @@ function calc(){
   document.getElementById('cardVal').textContent=fmt(card);
   document.getElementById('p80').textContent=fmt(cash*0.8);
   document.getElementById('p20').textContent=fmt(cash*0.2);
+  var TECH={'Mini Split':600,'Water Source':1050,'Split System':1050};
+  var sys=document.getElementById('system').value;
+  var tech=TECH[sys]||0;
+  var custoReal=s2+tech;              // (equip+misc)x1.1 + tecnico fixo
+  var lucro=cash-custoReal;
+  document.getElementById('profitVal').textContent=fmt(lucro);
+  document.getElementById('profitSub').textContent=sys+' · técnico '+fmt(tech);
   var pct=Math.round((mg-1)*100);
   document.getElementById('pctLabel').textContent='= '+pct+'% lucro';
   document.getElementById('marginLabel').textContent='× '+mg.toFixed(2)+' (margem)';
@@ -389,6 +429,7 @@ function updateBrand(){
 document.getElementById('brand').addEventListener('change',updateBrand);
 document.getElementById('brandOther').addEventListener('input',updateBrand);
 ['equip','misc','labor','margin'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+document.getElementById('system').addEventListener('change',calc);
 document.getElementById('copyCashBtn').addEventListener('click',function(){
   var v=document.getElementById('cashVal').textContent;
   navigator.clipboard.writeText(v).then(function(){
