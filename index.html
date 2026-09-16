@@ -263,6 +263,25 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .pe-item span{color:#8a7439; font-weight:600}
 .pe-item b{color:var(--teal-d); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap}
 .pe-item small{display:block; font-size:10px; color:#a89257; font-weight:600; text-transform:uppercase; letter-spacing:.03em}
+
+/* ---- Simular desconto ---- */
+.disc{margin-top:14px; background:#f4f9f9; border:1px solid var(--line); border-radius:16px; padding:.9rem 1.1rem}
+.disc-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
+.disc-lbl{font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--teal-deep)}
+.disc-field{position:relative; width:96px}
+.disc-field input{width:100%; padding:9px 30px 9px 12px; font-family:inherit; font-size:16px; font-weight:800; color:var(--teal-d); text-align:right; border:2px solid var(--line); border-radius:11px; background:#fff; outline:none; transition:border-color .18s, box-shadow .18s}
+.disc-field input:focus{border-color:var(--teal); box-shadow:0 0 0 4px rgba(27,107,112,.12)}
+.disc-field .disc-pct{position:absolute; right:11px; top:50%; transform:translateY(-50%); color:var(--muted); font-weight:700; font-size:14px; pointer-events:none}
+.disc-quick{display:flex; gap:7px; margin-top:10px}
+.qbtn{flex:1; padding:8px 0; font-family:inherit; font-size:13px; font-weight:700; color:var(--teal-d); background:#fff; border:1.5px solid var(--line); border-radius:10px; cursor:pointer; transition:all .15s}
+.qbtn:hover{border-color:var(--teal); background:#eef6f6}
+.qbtn:active{transform:scale(.96)}
+.disc-out{margin-top:.85rem; padding-top:.8rem; border-top:1px dashed #cfe0e0; display:flex; flex-direction:column; gap:6px}
+.do-row{display:flex; align-items:baseline; justify-content:space-between; gap:10px; font-size:13px}
+.do-row span{color:var(--muted); font-weight:600}
+.do-row b{color:var(--teal-d); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap}
+.do-row b.ok{color:#1f7a55}
+.do-row b.warn{color:#c0552e}
 </style>
 </head>
 <body>
@@ -372,6 +391,26 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
     </div>
 
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-lbl">Simular desconto</span>
+        <div class="disc-field">
+          <input type="number" id="disc" value="0" min="0" max="100" step="1" inputmode="decimal" />
+          <span class="disc-pct">%</span>
+        </div>
+      </div>
+      <div class="disc-quick">
+        <button type="button" class="qbtn" data-d="5">5%</button>
+        <button type="button" class="qbtn" data-d="10">10%</button>
+        <button type="button" class="qbtn" data-d="15">15%</button>
+        <button type="button" class="qbtn" data-d="20">20%</button>
+      </div>
+      <div class="disc-out">
+        <div class="do-row"><span>Preço à vista c/ desconto</span><b id="discPrice">—</b></div>
+        <div class="do-row"><span>Lucro c/ desconto</span><b id="discProfit">—</b></div>
+      </div>
+    </div>
+
     <div class="split">
       <div class="split-item">
         <span class="pctlbl">80%</span>
@@ -434,6 +473,15 @@ function calc(){
   document.getElementById('costVal').textContent = fmt(custoReal);
   var minPrice = custoReal/0.70;                     // menor preco a vista que mantem 30% de lucro
   document.getElementById('minVal').textContent = fmt(minPrice);
+  var d = parseFloat(document.getElementById('disc').value)||0;
+  if(d<0) d=0; if(d>100) d=100;
+  var precoDesc = cash*(1-d/100);
+  var lucroDesc = precoDesc - custoReal;
+  var pctDesc = precoDesc>0 ? (lucroDesc/precoDesc*100) : 0;
+  document.getElementById('discPrice').textContent = fmt(precoDesc);
+  var dp = document.getElementById('discProfit');
+  dp.textContent = fmt(lucroDesc)+'  ('+pctDesc.toFixed(1)+'%)';
+  dp.className = pctDesc>=30 ? 'ok' : 'warn';
   var pct=Math.round((mg-1)*100);
   document.getElementById('pctLabel').textContent='= '+pct+'% lucro';
   document.getElementById('marginLabel').textContent='× '+mg.toFixed(2)+' (margem)';
@@ -451,6 +499,13 @@ document.getElementById('brand').addEventListener('change',updateBrand);
 document.getElementById('brandOther').addEventListener('input',updateBrand);
 ['equip','misc','labor','margin'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
 document.getElementById('system').addEventListener('change',calc);
+document.getElementById('disc').addEventListener('input',calc);
+document.querySelectorAll('.qbtn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.getElementById('disc').value=btn.getAttribute('data-d');
+    calc();
+  });
+});
 document.getElementById('copyCashBtn').addEventListener('click',function(){
   var v=document.getElementById('cashVal').textContent;
   navigator.clipboard.writeText(v).then(function(){
