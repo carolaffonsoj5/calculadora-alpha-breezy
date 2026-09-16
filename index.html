@@ -120,7 +120,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .steps .divider{height:1px;background:var(--line)}
 
 .results{display:flex; flex-direction:column; gap:12px}
-.col-inputs .results{margin-top:1.15rem}
+.g-b .results{margin-top:0}
 .price{
   position:relative; overflow:hidden;
   border-radius:18px; padding:1.15rem 1.25rem;
@@ -193,6 +193,8 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   box-shadow:0 8px 18px -8px rgba(8,46,50,.7);
 }
 .copy-full:hover{transform:translateY(-2px); box-shadow:0 12px 22px -8px rgba(8,46,50,.85)}
+.copy-full.jpg{background:var(--teal); color:#fff; box-shadow:0 8px 18px -8px rgba(27,107,112,.8)}
+.copy-full.jpg:hover{box-shadow:0 12px 22px -8px rgba(27,107,112,.95)}
 .copy-full:active{transform:translateY(0) scale(.99)}
 .copy-full svg{width:14px;height:14px;flex:none}
 
@@ -217,7 +219,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .col{display:contents}
 
 @media (min-width:800px){
-  .card{max-width:880px}
+  .card{max-width:1010px}
   .hero{padding:1.4rem 1.5rem 1.3rem}
   .lockup{max-width:640px; gap:24px}
   .lockup .masc{height:134px}
@@ -226,14 +228,32 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   .body{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:0 2rem;
+    grid-template-areas:"a c" "b d";
+    gap:0 1.9rem;
     align-items:start;
     padding:2rem 2rem 2.1rem;
   }
   .col{display:flex; flex-direction:column}
-  .col-output .brand-tag{margin-top:0}
-  .col-output .steps{margin-top:0}
-  .col-output .copy-row{margin-top:1rem}
+  .g-a{grid-area:a; display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; align-content:start}
+  .g-a .field:last-of-type{grid-column:1/-1}
+  .g-b{grid-area:b}
+  .g-c{grid-area:c}
+  .g-d{grid-area:d}
+  .g-c .brand-tag{margin-top:0}
+  .g-c .steps{margin-top:0}
+  .g-b .copy-row{margin-top:1rem}
+}
+
+/* tres colunas nas telas largas */
+@media (min-width:1150px){
+  .card{max-width:1230px}
+  .body{
+    grid-template-columns:1fr 1.15fr 1fr;
+    grid-template-areas:"a b d" "c b d";
+    gap:0 1.9rem;
+    padding:2.1rem 2.2rem 2.2rem;
+  }
+  .g-c{margin-top:.2rem}
 }
 
 /* ---- Seletor de marca ---- */
@@ -365,7 +385,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   </div>
   <div class="page-title"><span id="ptText">Calculadora de Equipamento</span></div>
   <div class="body">
-    <div class="col col-inputs">
+    <div class="col g-a">
     <div class="field">
       <label>Marca da máquina</label>
       <div class="input-wrap">
@@ -394,7 +414,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
     </div>
     <div class="field">
-      <label>Custo do técnico <small>(preenche pelo tipo)</small></label>
+      <label>Custo do técnico <small>(auto)</small></label>
       <div class="input-wrap"><span class="dollar">$</span>
         <input type="number" id="tech" value="600" min="0" step="50" inputmode="decimal" /></div>
     </div>
@@ -420,7 +440,9 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
         <span class="pct-suffix" id="pctLabel">= 50% lucro</span>
       </div>
     </div>
+    </div>
 
+    <div class="col g-b">
     <div class="results">
       <div class="price cash">
         <div class="meta">
@@ -438,11 +460,13 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
     </div>
 
+
     <div class="round-row">
       <span class="round-lbl">Arredondar à vista</span>
       <button type="button" class="rbtn" data-r="50">↑ $50</button>
       <button type="button" class="rbtn" data-r="100">↑ $100</button>
     </div>
+
 
 
     <div class="profit">
@@ -464,6 +488,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
     </div>
 
 
+
     <div class="copy-row">
       <button class="copy-btn cash" id="copyCashBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -475,14 +500,20 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </button>
     </div>
 
+
+    <button type="button" class="copy-full jpg" id="jpgBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-5-5L5 21"/></svg>
+      <span id="jpgLabel">Salvar JPG do cálculo</span>
+    </button>
+
     <button type="button" class="copy-full" id="copyFullBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
       <span id="copyFullLabel">Copiar resumo completo</span>
     </button>
 
-    </div><!-- /col-inputs -->
+    </div>
 
-    <div class="col col-output">
+    <div class="col g-c">
     <div class="brand-tag" id="brandTag">Rheem</div>
     <div class="steps">
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">Equipamento</span></span><span class="v" id="r0">—</span></div>
@@ -496,6 +527,9 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       <div class="row"><span class="k"><span class="dot"></span><span class="txt" id="marginLabel">× margem</span></span><span class="v" id="r4">—</span></div>
     </div>
 
+    </div>
+
+    <div class="col g-d">
     <div class="disc">
       <span class="disc-lbl">Simular desconto</span>
 
@@ -560,7 +594,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
     </div>
     <div class="split-cap" id="splitCap">80% / 20% do valor à vista</div>
 
-    </div><!-- /col-output -->
+    </div>
   </div>
   <div class="foot">ALPHA BREEZY HEATING &amp; COOLING</div>
 </div>
@@ -739,6 +773,193 @@ function miniCopy(btnId, labelId, getVal){
     });
   });
 }
+/* ===================== JPG do calculo =====================
+   Desenha a imagem num canvas (nada de biblioteca externa, funciona offline). */
+function moeda(n){return fmt(n);}
+
+function desenhaJPG(ctx, W, medir){
+  var C={deep:'#082E32', teal:'#1B6B70', teald:'#0E4A4F', cream:'#EDE4C8',
+         gold:'#E8B84B', ink:'#0E2A2C', muted:'#6c8587', line:'#dfe9e9', bg:'#FFFFFF'};
+  var F=function(sz,peso){return (peso||600)+' '+sz+'px Poppins, "Segoe UI", system-ui, sans-serif';};
+  var P=56, y=0;
+
+  function rrect(x,yy,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,yy); ctx.arcTo(x+w,yy,x+w,yy+h,r); ctx.arcTo(x+w,yy+h,x,yy+h,r);
+    ctx.arcTo(x,yy+h,x,yy,r); ctx.arcTo(x,yy,x+w,yy,r); ctx.closePath();
+  }
+  function linha(rot,val,corVal,peso){
+    if(!medir){
+      ctx.fillStyle=C.muted; ctx.font=F(21,600); ctx.textAlign='left';
+      ctx.fillText(rot,P,y+22);
+      ctx.fillStyle=corVal||C.ink; ctx.font=F(22,peso||700); ctx.textAlign='right';
+      ctx.fillText(val,W-P,y+22);
+    }
+    y+=40;
+  }
+  function titulo(t){
+    if(!medir){
+      ctx.fillStyle=C.teal; ctx.font=F(16,800); ctx.textAlign='left';
+      ctx.save(); ctx.letterSpacing='2px';
+      ctx.fillText(t.toUpperCase(),P,y+16); ctx.restore();
+    }
+    y+=34;
+  }
+  function separador(){
+    if(!medir){ ctx.strokeStyle=C.line; ctx.lineWidth=2; ctx.beginPath();
+      ctx.moveTo(P,y+8); ctx.lineTo(W-P,y+8); ctx.stroke(); }
+    y+=26;
+  }
+
+  /* ---- topo ---- */
+  var TOPO=210;
+  if(!medir){
+    ctx.fillStyle=C.deep; ctx.fillRect(0,0,W,TOPO);
+    var masc=document.querySelector('.lockup .masc'), nome=document.querySelector('.lockup .nome');
+    var hM=128, wM=masc.naturalWidth*hM/masc.naturalHeight;
+    var wN=440, hN=nome.naturalHeight*wN/nome.naturalWidth;
+    var total=wM+26+wN, x0=(W-total)/2;
+    ctx.drawImage(masc,x0,(TOPO-hM)/2,wM,hM);
+    ctx.drawImage(nome,x0+wM+26,(TOPO-hN)/2,wN,hN);
+  }
+  y=TOPO;
+
+  /* ---- faixa creme ---- */
+  if(!medir){
+    ctx.fillStyle=C.cream; ctx.fillRect(0,y,W,56);
+    ctx.fillStyle=C.deep; ctx.font=F(21,800); ctx.textAlign='center';
+    ctx.save(); ctx.letterSpacing='4px';
+    ctx.fillText('CALCULADORA DE EQUIPAMENTO',W/2,y+36); ctx.restore();
+  }
+  y+=56+40;
+
+  /* ---- marca / sistema / data ---- */
+  var marca=document.getElementById('brandTag').textContent;
+  if(!medir){
+    ctx.textAlign='left'; ctx.fillStyle=C.deep; ctx.font=F(34,800);
+    ctx.fillText(marca+' · '+LAST.sys,P,y+30);
+    ctx.textAlign='right'; ctx.fillStyle=C.muted; ctx.font=F(19,600);
+    ctx.fillText(new Date().toLocaleDateString('pt-BR'),W-P,y+30);
+  }
+  y+=62;
+
+  titulo('Entradas');
+  linha('Valor do equipamento',moeda(LAST.equip));
+  linha('Miscelâneo',moeda(LAST.misc));
+  linha('Labor cobrado',moeda(LAST.labor));
+  linha('Margem de lucro','x'+LAST.margem.toFixed(2)+'  ('+Math.round((LAST.margem-1)*100)+'%)');
+  linha('Custo do técnico',moeda(LAST.tech));
+  separador();
+
+  /* ---- precos ---- */
+  var bw=(W-P*2-20)/2, bh=118;
+  if(!medir){
+    ctx.fillStyle=C.teald; rrect(P,y,bw,bh,18); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font=F(17,700); ctx.textAlign='left';
+    ctx.fillText('ZELLE · CHECK · CASH',P+24,y+38);
+    ctx.fillStyle='#fff'; ctx.font=F(40,800);
+    ctx.fillText(moeda(LAST.cash),P+24,y+88);
+
+    ctx.fillStyle='#FFFBF0'; rrect(P+bw+20,y,bw,bh,18); ctx.fill();
+    ctx.strokeStyle=C.gold; ctx.lineWidth=3; rrect(P+bw+20,y,bw,bh,18); ctx.stroke();
+    ctx.fillStyle=C.muted; ctx.font=F(17,700);
+    ctx.fillText('CARTÃO (+4%)',P+bw+44,y+38);
+    ctx.fillStyle=C.teald; ctx.font=F(40,800);
+    ctx.fillText(moeda(LAST.card),P+bw+44,y+88);
+  }
+  y+=bh+26;
+
+  /* ---- lucro ---- */
+  var lh=200;
+  if(!medir){
+    ctx.fillStyle='#FDF6E3'; rrect(P,y,W-P*2,lh,18); ctx.fill();
+    ctx.strokeStyle=C.gold; ctx.lineWidth=3; rrect(P,y,W-P*2,lh,18); ctx.stroke();
+    ctx.textAlign='left'; ctx.fillStyle=C.teald; ctx.font=F(17,800);
+    ctx.save(); ctx.letterSpacing='2px'; ctx.fillText('SEU LUCRO',P+26,y+40); ctx.restore();
+    ctx.textAlign='right'; ctx.font=F(42,800);
+    ctx.fillText(moeda(LAST.lucro),W-P-26,y+48);
+    ctx.fillStyle=C.muted; ctx.font=F(19,700);
+    ctx.fillText(LAST.pctLucro.toFixed(1)+'% de lucro',W-P-26,y+80);
+  }
+  var ySalvo=y; y+=104;
+  var pad=P; P=P+26;
+  linha('Custo final (seu)',moeda(LAST.cost),C.teald);
+  linha('Preço mín. p/ 30% de lucro',document.getElementById('minVal').textContent,C.teald);
+  P=pad;
+  y=ySalvo+lh+26;
+
+  /* ---- desconto (so aparece se tiver) ---- */
+  if(Math.abs(LAST.cash-LAST.discCash)>0.005){
+    var dpct=LAST.cash>0?(1-LAST.discCash/LAST.cash)*100:0;
+    var dl=LAST.discCash-LAST.cost, dpl=LAST.discCash>0?(dl/LAST.discCash*100):0;
+    var dh=196;
+    if(!medir){
+      ctx.fillStyle='#F2F8F8'; rrect(P,y,W-P*2,dh,18); ctx.fill();
+      ctx.strokeStyle=C.line; ctx.lineWidth=2; rrect(P,y,W-P*2,dh,18); ctx.stroke();
+    }
+    var yS=y; y+=22; var pd=P; P=P+26;
+    titulo(dpct<0 ? 'Com acréscimo de '+Math.abs(dpct).toFixed(1)+'%'
+                  : 'Com desconto de '+dpct.toFixed(1)+'%');
+    linha('À vista',moeda(LAST.discCash),C.teald,800);
+    linha('Cartão',moeda(LAST.discCard),C.teald,800);
+    linha('Lucro',moeda(dl)+'  ('+dpl.toFixed(1)+'%)',dpl>=30?'#1a7f4b':'#b06b00',800);
+    P=pd; y=yS+dh+26;
+  }
+
+  /* ---- divisao ---- */
+  var sp=parseFloat(document.getElementById('splitPct').value)||0;
+  linha(sp+'% / '+(100-sp)+'%  —  '+document.getElementById('splitCap').textContent.split('do valor ')[1],
+        document.getElementById('p80').textContent+'  /  '+document.getElementById('p20').textContent,C.teald);
+  y+=14;
+
+  /* ---- rodape ---- */
+  if(!medir){
+    ctx.fillStyle=C.deep; ctx.fillRect(0,y,W,64);
+    ctx.textAlign='center'; ctx.fillStyle='rgba(237,228,200,.85)'; ctx.font=F(17,600);
+    ctx.save(); ctx.letterSpacing='2px';
+    ctx.fillText('ALPHA BREEZY HEATING & COOLING · DOCUMENTO INTERNO',W/2,y+40); ctx.restore();
+  }
+  y+=64;
+  return y;
+}
+
+function geraJPG(){
+  var W=1000, esc=2;
+  var med=document.createElement('canvas').getContext('2d');
+  var H=Math.ceil(desenhaJPG(med,W,true));
+  var cv=document.createElement('canvas');
+  cv.width=W*esc; cv.height=H*esc;
+  var ctx=cv.getContext('2d');
+  ctx.scale(esc,esc);
+  ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,W,H);
+  desenhaJPG(ctx,W,false);
+  return cv;
+}
+
+document.getElementById('jpgBtn').addEventListener('click',function(){
+  var lab=document.getElementById('jpgLabel'), orig=lab.textContent;
+  function aviso(t){ lab.textContent=t; setTimeout(function(){lab.textContent=orig;},1800); }
+  function salva(){
+    var cv=geraJPG();
+    var marca=document.getElementById('brandTag').textContent.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+    var nome='alpha-breezy-'+marca+'-'+new Date().toISOString().slice(0,10)+'.jpg';
+    cv.toBlob(function(blob){
+      if(!blob){ aviso('Não deu certo'); return; }
+      var arq=new File([blob],nome,{type:'image/jpeg'});
+      if(navigator.canShare && navigator.canShare({files:[arq]})){
+        navigator.share({files:[arq]}).then(function(){aviso('Pronto!');}).catch(function(){});
+        return;
+      }
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a'); a.href=url; a.download=nome;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},4000);
+      aviso('Salvo!');
+    },'image/jpeg',0.94);
+  }
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(salva); } else { salva(); }
+});
+
 function resumo(){
   var marca = document.getElementById('brandTag').textContent;
   var L = [
