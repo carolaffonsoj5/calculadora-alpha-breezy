@@ -98,6 +98,16 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   outline:none; transition:border-color .18s, box-shadow .18s;
 }
 .field input.with-suffix{padding-right:90px}
+.cap-row{display:flex; gap:10px; align-items:stretch}
+.cap-input{flex:1; min-width:0}
+.cap-input input{padding-left:14px}
+.cap-unit{display:flex; gap:4px; background:#e5eeee; padding:4px; border-radius:12px; flex:none}
+.ubtn{
+  padding:0 13px; font-family:inherit; font-size:12px; font-weight:700;
+  color:var(--muted); background:transparent; border:none; border-radius:9px;
+  cursor:pointer; transition:all .15s; -webkit-tap-highlight-color:transparent;
+}
+.ubtn.active{background:#fff; color:var(--teal-d); box-shadow:0 2px 6px rgba(14,74,79,.16)}
 .field input:hover{border-color:#cfe0e0}
 .field input:focus{border-color:var(--teal); background:#fff; box-shadow:0 0 0 4px rgba(27,107,112,.12)}
 
@@ -235,7 +245,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   }
   .col{display:flex; flex-direction:column}
   .g-a{grid-area:a; display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; align-content:start}
-  .g-a .field:last-of-type{grid-column:1/-1}
+  .g-a .field:last-of-type, .g-a .field-wide{grid-column:1/-1}
   .g-b{grid-area:b}
   .g-c{grid-area:c}
   .g-d{grid-area:d}
@@ -413,6 +423,20 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
         </select>
       </div>
     </div>
+    <div class="field field-wide">
+      <label>Capacidade <small>(opcional)</small></label>
+      <div class="cap-row">
+        <div class="input-wrap cap-input">
+          <input type="number" id="cap" min="0" step="0.5" inputmode="decimal" placeholder="0" class="with-suffix" />
+          <span class="pct-suffix" id="capEq"></span>
+        </div>
+        <div class="cap-unit">
+          <button type="button" class="ubtn active" data-u="kbtu">kBTU</button>
+          <button type="button" class="ubtn" data-u="ton">Ton</button>
+        </div>
+      </div>
+    </div>
+
     <div class="field">
       <label>Custo do técnico <small>(auto)</small></label>
       <div class="input-wrap"><span class="dollar">$</span>
@@ -715,6 +739,42 @@ document.getElementById('system').addEventListener('change',function(){
 });
 document.getElementById('disc').addEventListener('input',calc);
 document.getElementById('splitPct').addEventListener('input',calc);
+
+/* ---- capacidade: kBTU <-> tonelagem (1 ton = 12k) ---- */
+var CAPU='kbtu';
+function numCurto(v){
+  return (Math.round(v*100)/100).toString();
+}
+function capValor(){
+  var v=parseFloat(document.getElementById('cap').value);
+  return (isFinite(v)&&v>0) ? v : 0;
+}
+function capTexto(){                     // "48k (4 ton)" ou "4 ton (48k)"
+  var v=capValor(); if(!v) return '';
+  return CAPU==='kbtu' ? numCurto(v)+'k ('+numCurto(v/12)+' ton)'
+                       : numCurto(v)+' ton ('+numCurto(v*12)+'k)';
+}
+function capAtualiza(){
+  var v=capValor();
+  document.getElementById('capEq').textContent =
+    !v ? '' : (CAPU==='kbtu' ? '= '+numCurto(v/12)+' ton' : '= '+numCurto(v*12)+'k');
+  LAST.cap = capTexto();
+}
+document.getElementById('cap').addEventListener('input',capAtualiza);
+document.querySelectorAll('.ubtn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var u=btn.getAttribute('data-u');
+    if(u===CAPU) return;
+    var campo=document.getElementById('cap'), v=capValor();
+    if(v) campo.value = numCurto(u==='ton' ? v/12 : v*12);   // converte o que ja esta escrito
+    CAPU=u;
+    document.querySelectorAll('.ubtn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-u')===u);
+    });
+    capAtualiza();
+  });
+});
+capAtualiza();
 document.querySelectorAll('.rbtn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var r=parseFloat(btn.getAttribute('data-r'));
@@ -837,13 +897,14 @@ function desenhaJPG(ctx, W, medir){
   var marca=document.getElementById('brandTag').textContent;
   if(!medir){
     ctx.textAlign='left'; ctx.fillStyle=C.deep; ctx.font=F(34,800);
-    ctx.fillText(marca+' · '+LAST.sys,P,y+30);
+    ctx.fillText(marca+' · '+LAST.sys+(LAST.cap?' · '+LAST.cap.split(' (')[0]:''),P,y+30);
     ctx.textAlign='right'; ctx.fillStyle=C.muted; ctx.font=F(19,600);
     ctx.fillText(new Date().toLocaleDateString('pt-BR'),W-P,y+30);
   }
   y+=62;
 
   titulo('Entradas');
+  if(LAST.cap) linha('Capacidade',LAST.cap);
   linha('Valor do equipamento',moeda(LAST.equip));
   linha('Miscelâneo',moeda(LAST.misc));
   linha('Labor cobrado',moeda(LAST.labor));
@@ -964,7 +1025,7 @@ function resumo(){
   var marca = document.getElementById('brandTag').textContent;
   var L = [
     'Marca: ' + marca,
-    'Tipo de sistema: ' + LAST.sys,
+    'Tipo de sistema: ' + LAST.sys + (LAST.cap ? '  —  ' + LAST.cap : ''),
     'Valor do equipamento: ' + fmt(LAST.equip),
     'Miscelâneo: ' + fmt(LAST.misc),
     'Labor cobrado: ' + fmt(LAST.labor),
