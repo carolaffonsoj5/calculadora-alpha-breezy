@@ -249,22 +249,10 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   .g-b{grid-area:b}
   .g-c{grid-area:c}
   .g-d{grid-area:d}
-  .g-c .brand-tag{margin-top:0}
-  .g-c .steps{margin-top:0}
+  .g-c   .g-c .steps{margin-top:0}
   .g-b .copy-row{margin-top:1rem}
 }
 
-/* tres colunas nas telas largas */
-@media (min-width:1150px){
-  .card{max-width:1230px}
-  .body{
-    grid-template-columns:1fr 1.15fr 1fr;
-    grid-template-areas:"a b d" "c b d";
-    gap:0 1.9rem;
-    padding:2.1rem 2.2rem 2.2rem;
-  }
-  .g-c{margin-top:.2rem}
-}
 
 /* ---- Seletor de marca ---- */
 .field select{
@@ -281,13 +269,6 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .brand-other{display:none; margin-top:8px}
 
 /* ---- Selo da marca no painel ---- */
-.brand-tag{
-  align-self:flex-start; margin-top:1.2rem;
-  display:inline-flex; align-items:center;
-  background:var(--teal-deep); color:var(--cream);
-  font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
-  padding:6px 14px; border-radius:999px; margin-bottom:1rem;
-}
 
 /* ---- Arredondar ---- */
 .round-row{display:flex; align-items:center; gap:8px; margin-top:11px}
@@ -381,6 +362,133 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .do-row b{color:var(--teal-d); font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap}
 .do-row b.ok{color:#1f7a55}
 .do-row b.warn{color:#c0552e}
+
+/* tres colunas nas telas largas — compacto, pra caber tudo numa tela so */
+@media (min-width:1150px){
+  .card{max-width:1230px}
+  .body{
+    grid-template-columns:1fr 1.15fr 1fr;
+    grid-template-areas:"a b d" "c b d";
+    gap:0 1.6rem;
+    padding:1.3rem 1.7rem 1.5rem;
+  }
+  .g-c{margin-top:0}
+
+  /* topo mais baixo */
+  .hero{padding:.75rem 1.5rem .7rem}
+  .lockup{max-width:560px; gap:20px}
+  .lockup .masc{height:98px}
+  .lockup .wm{max-width:370px}
+  .page-title{font-size:15px; padding:6px 1.25rem}
+
+  /* campos */
+  .field{margin-bottom:.6rem}
+  .field label{font-size:11px; margin-bottom:4px}
+  .field input{padding:9px 12px 9px 27px; font-size:15px; border-radius:12px}
+  .field input.with-suffix{padding-right:78px}
+  .cap-input input{padding-left:12px}
+  .field select{padding:9px 34px 9px 12px; font-size:15px; border-radius:12px}
+  .ubtn{padding:0 11px}
+
+  /* memoria de calculo */
+  .steps{margin:.5rem 0 0; padding:.7rem .85rem; gap:6px; font-size:12.5px}
+
+  /* precos */
+  .results{gap:9px}
+  .price{padding:.75rem 1rem; border-radius:15px}
+  .price .val{font-size:23px}
+  .price .ic{width:34px; height:34px}
+  .price .ic svg{width:17px;height:17px}
+  .round-row{margin-top:8px}
+  .rbtn{padding:6px 12px; font-size:12px}
+
+  /* lucro */
+  .profit{padding:.9rem 1.1rem; margin-top:.75rem; border-radius:15px}
+  .profit .big{font-size:29px}
+  .profit-extra{margin-top:.55rem; padding-top:.55rem; gap:5px}
+
+  /* botoes: os dois largos lado a lado */
+  .g-b{display:grid; grid-template-columns:1fr 1fr; gap:0 10px; align-content:start}
+  .g-b > *{grid-column:1/-1}
+  .g-b > .copy-full{grid-column:auto; margin-top:9px; padding:10px 8px; font-size:12px}
+  .g-b .copy-row{margin-top:.75rem}
+  .copy-btn{padding:10px 8px; font-size:12.5px}
+
+  /* desconto */
+  .disc{padding:.85rem 1rem; margin-top:0}
+  .disc-mode{padding:3px}
+  .mbtn{padding:7px 4px}
+  .disc-head{margin-top:.6rem}
+  .disc-field input{padding:7px 10px}
+  .disc-quick{margin-top:.6rem}
+  .qbtn{padding:7px 4px}
+  .disc-out{margin-top:.7rem; padding-top:.7rem; gap:6px}
+  .disc-copy{margin-top:.65rem}
+  .copy-mini{padding:8px 6px}
+
+  /* divisao 80/20 */
+  .split{margin-top:9px; gap:9px}
+  .split-item{padding:.7rem}
+  .split-item .pctval{font-size:19px}
+  .split-cap{margin-top:5px}
+  .foot{padding:.7rem}
+}
+
+
+/* telas baixas (notebook): aperta mais um pouco pra caber tudo sem rolar */
+@media (min-width:1150px) and (max-height:900px){
+  body{padding:.5rem}
+  .hero{padding:.5rem 1.5rem .45rem}
+  .lockup{gap:16px}
+  .lockup .masc{height:80px}
+  .lockup .wm{max-width:310px; gap:7px}
+  .page-title{font-size:13.5px; padding:5px 1rem}
+  .body{padding:.95rem 1.5rem 1.05rem; gap:0 1.4rem}
+
+  .field{margin-bottom:.45rem}
+  .field label{font-size:10.5px; margin-bottom:3px}
+  .field input{padding:7px 10px 7px 25px; font-size:14px}
+  .field input.with-suffix{padding-right:70px}
+  .cap-input input{padding-left:10px}
+  .field select{padding:7px 30px 7px 10px; font-size:14px}
+  .input-wrap .dollar, .input-wrap .x{font-size:14px}
+  .input-wrap .pct-suffix{font-size:11px}
+  .cap-unit{padding:3px}
+  .ubtn{font-size:11px; padding:0 10px}
+
+  .steps{padding:.55rem .75rem; gap:5px; font-size:12px; margin-top:.4rem}
+
+  .results{gap:7px}
+  .price{padding:.55rem .85rem}
+  .price .val{font-size:21px}
+  .price .ic{width:30px;height:30px}
+  .price .ic svg{width:15px;height:15px}
+  .price .ttl{font-size:12px}
+  .round-row{margin-top:6px}
+  .rbtn{padding:5px 11px; font-size:11.5px}
+
+  .profit{padding:.7rem .95rem; margin-top:.6rem}
+  .profit .big{font-size:26px}
+  .profit-extra{margin-top:.45rem; padding-top:.45rem; gap:4px}
+
+  .copy-btn{padding:8px 6px; font-size:11.5px}
+  .g-b .copy-row{margin-top:.6rem}
+  .g-b > .copy-full{padding:8px 6px; font-size:11.5px; margin-top:7px}
+
+  .disc{padding:.7rem .85rem}
+  .disc-head{margin-top:.5rem}
+  .disc-quick{margin-top:.5rem}
+  .mbtn, .qbtn{padding:6px 4px; font-size:11.5px}
+  .disc-out{margin-top:.6rem; padding-top:.6rem; gap:5px}
+  .disc-copy{margin-top:.55rem}
+  .copy-mini{padding:7px 5px; font-size:11px}
+
+  .split{margin-top:7px; gap:7px}
+  .split-item{padding:.55rem}
+  .split-item .pctval{font-size:17px}
+  .foot{padding:.55rem; font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -538,7 +646,6 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
     </div>
 
     <div class="col g-c">
-    <div class="brand-tag" id="brandTag">Rheem</div>
     <div class="steps">
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">Equipamento</span></span><span class="v" id="r0">—</span></div>
       <div class="divider"></div>
@@ -719,6 +826,7 @@ function calc(){
   document.getElementById('pctLabel').textContent='= '+pct+'% lucro';
   document.getElementById('marginLabel').textContent='× '+mg.toFixed(2)+' (margem)';
 }
+var MARCA='Rheem';
 function updateBrand(){
   var sel=document.getElementById('brand');
   var wrap=document.getElementById('brandOtherWrap');
@@ -726,7 +834,7 @@ function updateBrand(){
   var name;
   if(sel.value==='__other'){ wrap.style.display='block'; name=other.value.trim()||'Outra'; }
   else { wrap.style.display='none'; name=sel.value; }
-  document.getElementById('brandTag').textContent=name;
+  MARCA=name;
 }
 document.getElementById('brand').addEventListener('change',updateBrand);
 document.getElementById('brandOther').addEventListener('input',updateBrand);
@@ -894,7 +1002,7 @@ function desenhaJPG(ctx, W, medir){
   y+=56+40;
 
   /* ---- marca / sistema / data ---- */
-  var marca=document.getElementById('brandTag').textContent;
+  var marca=MARCA;
   if(!medir){
     ctx.textAlign='left'; ctx.fillStyle=C.deep; ctx.font=F(34,800);
     ctx.fillText(marca+' · '+LAST.sys+(LAST.cap?' · '+LAST.cap.split(' (')[0]:''),P,y+30);
@@ -1002,7 +1110,7 @@ document.getElementById('jpgBtn').addEventListener('click',function(){
   function aviso(t){ lab.textContent=t; setTimeout(function(){lab.textContent=orig;},1800); }
   function salva(){
     var cv=geraJPG();
-    var marca=document.getElementById('brandTag').textContent.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+    var marca=MARCA.replace(/[^a-z0-9]+/gi,'-').toLowerCase();
     var nome='alpha-breezy-'+marca+'-'+new Date().toISOString().slice(0,10)+'.jpg';
     cv.toBlob(function(blob){
       if(!blob){ aviso('Não deu certo'); return; }
@@ -1022,7 +1130,7 @@ document.getElementById('jpgBtn').addEventListener('click',function(){
 });
 
 function resumo(){
-  var marca = document.getElementById('brandTag').textContent;
+  var marca = MARCA;
   var L = [
     'Marca: ' + marca,
     'Tipo de sistema: ' + LAST.sys + (LAST.cap ? '  —  ' + LAST.cap : ''),
