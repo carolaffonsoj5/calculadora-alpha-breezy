@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!--
+  ALPHA BREEZY HEATING & COOLING — Calculadora de Equipamento
+  Versao 1.0 · 18 de setembro de 2026
+  Arquivo unico, sem dependencias externas. Acompanha: manifest.json, sw.js,
+  icon-192.png, icon-512.png (todos na mesma pasta).
+  Padrao de referencia para as proximas ferramentas da empresa.
+-->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
@@ -102,13 +109,22 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .cap-row{display:flex; gap:10px; align-items:stretch}
 .cap-input{flex:1; min-width:0}
 .cap-input input{padding-left:14px}
-.cap-unit{display:flex; gap:4px; background:#e5eeee; padding:4px; border-radius:12px; flex:none}
-.ubtn{
-  padding:0 13px; font-family:inherit; font-size:12px; font-weight:700;
-  color:var(--muted); background:transparent; border:none; border-radius:9px;
-  cursor:pointer; transition:all .15s; -webkit-tap-highlight-color:transparent;
+.cap-unit{
+  position:relative; display:flex; background:#e5eeee; padding:4px; border-radius:12px; flex:none;
 }
-.ubtn.active{background:#fff; color:var(--teal-d); box-shadow:0 2px 6px rgba(14,74,79,.16)}
+.cap-unit::before{                       /* a pilha branca que desliza */
+  content:""; position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+  background:#fff; border-radius:9px; box-shadow:0 2px 6px rgba(14,74,79,.16);
+  transition:transform .26s cubic-bezier(.4,0,.2,1);
+}
+.cap-unit.dir::before{transform:translateX(100%)}
+.ubtn{
+  position:relative; z-index:1; flex:1 0 auto; min-width:56px;
+  padding:6px 12px; font-family:inherit; font-size:12px; font-weight:700;
+  color:var(--muted); background:transparent; border:none; border-radius:9px;
+  cursor:pointer; transition:color .2s ease; -webkit-tap-highlight-color:transparent;
+}
+.ubtn.active{color:var(--teal-d)}
 .field input:hover{border-color:#cfe0e0}
 .field input:focus{border-color:var(--teal); background:#fff; box-shadow:0 0 0 4px rgba(27,107,112,.12)}
 
@@ -155,6 +171,14 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .price .ttl{font-size:13px; font-weight:700; line-height:1.2}
 .price .sub{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; margin-top:2px; opacity:.8}
 .price .val{font-size:clamp(22px,6.5vw,27px); font-weight:800; font-variant-numeric:tabular-nums; flex:none; line-height:1}
+.price .val-wrap{display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex:none}
+.price .val-de{
+  font-size:13px; font-weight:700; font-variant-numeric:tabular-nums;
+  text-decoration:line-through; opacity:.6; line-height:1; display:none;
+}
+.price .val-de.on{display:block}
+.price.cash .val-de{color:var(--cream)}
+.price.card .val-de{color:var(--muted)}
 
 .price.cash{
   background:linear-gradient(135deg,var(--teal) 0%, var(--teal-d) 100%);
@@ -191,10 +215,10 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .copy-btn svg{width:14px;height:14px;flex:none}
 
 .copy-btn.cash{
-  color:#fff; background:linear-gradient(135deg,var(--teal),var(--teal-d));
-  box-shadow:0 8px 18px -6px rgba(14,74,79,.55);
+  color:#5a3d06; background:linear-gradient(135deg,var(--gold),var(--gold-d));
+  box-shadow:0 8px 18px -6px rgba(232,184,75,.7);
 }
-.copy-btn.cash:hover{box-shadow:0 12px 22px -6px rgba(14,74,79,.7)}
+.copy-btn.cash:hover{box-shadow:0 12px 22px -6px rgba(232,184,75,.85)}
 
 .copy-btn.card{
   color:#5a3d06; background:linear-gradient(135deg,var(--gold),var(--gold-d));
@@ -212,16 +236,15 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   box-shadow:0 8px 18px -8px rgba(8,46,50,.7);
 }
 .copy-full:hover{transform:translateY(-2px); box-shadow:0 12px 22px -8px rgba(8,46,50,.85)}
-.copy-full.jpg{background:var(--teal); color:#fff; box-shadow:0 8px 18px -8px rgba(27,107,112,.8)}
 .copy-full.cliente{
   background:var(--cream); color:#5a4a1c; border:1.5px solid #d9cca4;
   box-shadow:0 6px 14px -8px rgba(154,131,72,.6);
 }
 .copy-full.cliente:hover{background:#f4edd8; box-shadow:0 10px 18px -8px rgba(154,131,72,.75)}
-.copy-full.jpg:hover{box-shadow:0 12px 22px -8px rgba(27,107,112,.95)}
 .copy-full:active{transform:translateY(0) scale(.99)}
 .copy-full svg{width:14px;height:14px;flex:none}
 
+.foot .ver{opacity:.55}
 .foot{
   text-align:center; padding:.9rem; font-size:10px; color:#a4b6b6;
   letter-spacing:.05em; border-top:1px solid var(--line);
@@ -295,7 +318,35 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .rbtn:hover{border-color:var(--teal); background:#eef6f6}
 .rbtn:active{transform:scale(.96)}
 
-/* ---- Preco arredondado ---- */
+/* ---- Linha da cadeia ---- */
+.cadeia{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:.55rem .7rem;
+  background:#eef6f6; border:1.5px dashed #cfe0e0; border-radius:11px;
+}
+.cad-acoes{display:flex; align-items:center; justify-content:flex-end; gap:8px; flex:1 1 100%}
+.cad-grid{
+  flex:1 1 100%; min-width:0;
+  display:grid; grid-template-columns:1fr auto auto;
+  gap:4px 12px; align-items:baseline;
+  font-size:11.5px; color:var(--teal-d);
+  font-variant-numeric:tabular-nums; line-height:1.35;
+}
+.cad-grid .op{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cad-grid .op.base{text-transform:uppercase; letter-spacing:.05em; font-size:10.5px; font-weight:800}
+.cad-grid .dl{text-align:right; font-weight:700; color:var(--muted)}
+.cad-grid .rs{text-align:right; font-weight:800}
+.cad-grid .avs{grid-column:1/-1; font-weight:700; color:#b06b00}
+.cad-inv{
+  flex:none; padding:5px 10px; font-family:inherit; font-size:10.5px; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase; color:var(--teal-d);
+  background:#fff; border:1.5px solid var(--line); border-radius:8px; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.cad-inv:hover{border-color:var(--teal); background:#f6fbfb}
+.cad-inv:active{transform:scale(.97)}
+
+/* ---- Preco final ---- */
 .rounded{
   margin-top:10px; padding:.8rem .9rem;
   background:#f2f8f8; border:1.5px solid #dcebeb; border-radius:15px;
@@ -368,13 +419,42 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 .disc-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:.8rem}
 .disc-lbl{display:block; font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--teal-deep); margin-bottom:.7rem}
 .disc-hint{font-size:11px; color:var(--muted); font-weight:600; line-height:1.35; min-width:0}
-.disc-mode{display:grid; grid-template-columns:1fr 1fr; gap:5px; background:#e5eeee; padding:4px; border-radius:12px}
+.seg{
+  position:relative; display:grid; grid-template-columns:1fr 1fr;
+  background:#e5eeee; padding:4px; border-radius:12px;
+}
+.seg::before{
+  content:""; position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+  background:#fff; border-radius:9px; box-shadow:0 2px 7px rgba(14,74,79,.18);
+  transition:transform .26s cubic-bezier(.4,0,.2,1);
+}
+.seg.dir::before{transform:translateX(100%)}
+.sbtn{
+  position:relative; z-index:1;
+  padding:10px 4px; font-family:inherit; font-size:12px; font-weight:700;
+  color:var(--muted); background:transparent; border:none; border-radius:9px;
+  cursor:pointer; transition:color .2s ease; -webkit-tap-highlight-color:transparent;
+}
+.sbtn.active{color:var(--teal-d)}
+body.modo-mult .campo-desloc, body.modo-mult .lin-desloc{display:none}
+
+.disc-mode{
+  position:relative; display:grid; grid-template-columns:1fr 1fr;
+  background:#e5eeee; padding:4px; border-radius:12px;
+}
+.disc-mode::before{
+  content:""; position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+  background:#fff; border-radius:9px; box-shadow:0 2px 7px rgba(14,74,79,.18);
+  transition:transform .26s cubic-bezier(.4,0,.2,1);
+}
+.disc-mode.dir::before{transform:translateX(100%)}
 .mbtn{
+  position:relative; z-index:1;
   padding:9px 4px; font-family:inherit; font-size:12.5px; font-weight:700;
   color:var(--muted); background:transparent; border:none; border-radius:9px;
-  cursor:pointer; transition:all .15s; -webkit-tap-highlight-color:transparent;
+  cursor:pointer; transition:color .2s ease; -webkit-tap-highlight-color:transparent;
 }
-.mbtn.active{background:#fff; color:var(--teal-d); box-shadow:0 2px 7px rgba(14,74,79,.18)}
+.mbtn.active{color:var(--teal-d)}
 .disc-field{position:relative; width:96px; flex:none}
 .disc-field.money{width:132px}
 .disc-field.money input{padding:9px 12px 9px 27px; text-align:right}
@@ -523,6 +603,9 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   .disc-copy{margin-top:.55rem}
   .copy-mini{padding:7px 5px; font-size:11px}
 
+  .cadeia{padding:.45rem .6rem}
+  #cadeiaWrap.aberto{margin-top:8px}
+  .cad-grid{font-size:10.5px; gap:3px 8px}
   .rounded{padding:.5rem .7rem; margin-top:7px}
   .ro-cards{margin-top:.4rem; gap:6px}
   .ro-card{padding:.35rem .5rem}
@@ -535,6 +618,34 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
   .foot{padding:.55rem; font-size:10px}
 }
 
+/* ---- abre/fecha suave (display nao anima, entao vai por max-height) ---- */
+/* ---- abre/fecha: a altura anima no envelope, o conteudo dentro nao se mexe ---- */
+.anim-wrap{
+  overflow:hidden; height:0; opacity:0; margin-top:0;
+  transition: height .28s cubic-bezier(.4,0,.2,1),
+              margin-top .28s cubic-bezier(.4,0,.2,1),
+              opacity .2s ease;
+}
+.anim-wrap.aberto{opacity:1}
+.anim-wrap > *{margin:0 !important}
+#cadeiaWrap{                              /* bloco baixo: precisa de mais tempo pra nao parecer seco */
+  transition: height .45s cubic-bezier(.4,0,.2,1),
+              margin-top .45s cubic-bezier(.4,0,.2,1),
+              opacity .3s ease;
+}
+#cadeiaWrap.aberto{margin-top:10px}
+#stepsWrap.aberto{margin-top:.9rem}
+
+@media (prefers-reduced-motion: reduce){
+  .anim-wrap{transition:none}
+  .cap-unit::before, .disc-mode::before, .seg::before{transition:none}
+  .cad-inv{transition:none}
+}
+@media (max-width:519px){
+  /* tela estreita: duas colunas (o grid precisa ir a 2, senao as linhas desalinham) */
+  .cad-grid{font-size:10.5px; gap:3px 8px; grid-template-columns:1fr auto auto}
+  .cad-inv{flex:1}
+}
 </style>
 </head>
 <body>
@@ -611,7 +722,14 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       <div class="input-wrap"><span class="dollar">$</span>
         <input type="number" id="labor" value="900" min="0" step="50" inputmode="decimal" /></div>
     </div>
-    <div class="field">
+    <div class="field field-wide">
+      <label>Fórmula de custo</label>
+      <div class="seg" id="segFormula">
+        <button type="button" class="sbtn active" data-f="det">Imposto + milhas</button>
+        <button type="button" class="sbtn" data-f="mult">× 1.1</button>
+      </div>
+    </div>
+    <div class="field campo-desloc">
       <label>Zona</label>
       <select id="zone">
         <option>Local</option>
@@ -621,12 +739,12 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
         <option>Homestead</option>
       </select>
     </div>
-    <div class="field">
+    <div class="field campo-desloc">
       <label>Viagens</label>
       <div class="input-wrap"><span class="x">×</span>
         <input type="number" id="trips" value="2" min="1" step="1" inputmode="numeric" /></div>
     </div>
-    <div class="field field-wide">
+    <div class="field field-wide campo-desloc">
       <label>Milhas <small>(ida e volta)</small></label>
       <div class="input-wrap">
         <input type="number" id="miles" value="10" min="0" step="5" inputmode="decimal" class="with-suffix miles-input" />
@@ -649,14 +767,20 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></div>
           <div class="txt"><div class="ttl">Zelle · Check · Cash</div><div class="sub">À vista</div></div>
         </div>
-        <div class="val" id="cashVal">—</div>
+        <div class="val-wrap">
+          <span class="val-de" id="cashDe"></span>
+          <div class="val" id="cashVal">—</div>
+        </div>
       </div>
       <div class="price card">
         <div class="meta">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
           <div class="txt"><div class="ttl">Cartão</div><div class="sub">+4%</div></div>
         </div>
-        <div class="val" id="cardVal">—</div>
+        <div class="val-wrap">
+          <span class="val-de" id="cardDe"></span>
+          <div class="val" id="cardVal">—</div>
+        </div>
       </div>
     </div>
 
@@ -669,23 +793,13 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 
 
 
-    <div class="rounded" id="roundedBox" style="display:none">
-      <div class="ro-head">
-        <span class="ro-lbl" id="roLbl">Preço arredondado</span>
-        <button type="button" class="ro-clear" id="roundClear" title="limpar">×</button>
+    <div class="anim-wrap" id="cadeiaWrap"><div class="cadeia" id="cadeiaBox">
+      <div class="cad-grid" id="cadeiaGrid"></div>
+      <div class="cad-acoes">
+        <button type="button" class="cad-inv fechado" id="invOrdem">&#8646; inverter ordem</button>
+        <button type="button" class="ro-clear" id="limparCadeia" title="limpar desconto e arredondamento">×</button>
       </div>
-      <div class="ro-cards">
-        <div class="ro-card"><span>À vista</span><b id="roCash">—</b></div>
-        <div class="ro-card"><span>No cartão (+4%)</span><b id="roCard">—</b></div>
-      </div>
-      <div class="ro-foot">
-        <span class="ro-profit" id="roProfit">—</span>
-        <div class="ro-copy">
-          <button type="button" class="copy-mini" id="copyRoCash"><span id="copyRoCashLabel">Copiar à vista</span></button>
-          <button type="button" class="copy-mini" id="copyRoCard"><span id="copyRoCardLabel">Copiar cartão</span></button>
-        </div>
-      </div>
-    </div>
+    </div></div>
 
     <div class="profit">
       <div class="profit-top">
@@ -700,7 +814,7 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
       </div>
       <div class="profit-extra">
         <div class="pe-item"><span>Custo final (seu)</span><b id="costVal">—</b></div>
-        <div class="pe-item"><span>Deslocamento</span><b id="deslocVal">—</b></div>
+        <div class="pe-item lin-desloc"><span>Deslocamento</span><b id="deslocVal">—</b></div>
         <div class="pe-item"><span>Preço mín. p/ 30% de lucro</span><b id="minVal">—</b></div>
         <div class="pe-item"><span>Desconto máx. p/ 30% de lucro</span><b id="maxDisc">—</b></div>
       </div>
@@ -744,19 +858,19 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 
     <div class="col g-c">
     <button type="button" class="detail-toggle" id="detailToggle">Ver detalhamento</button>
-    <div class="steps" id="stepsPanel" style="display:none">
+    <div class="anim-wrap" id="stepsWrap"><div class="steps" id="stepsPanel">
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">Equipamento</span></span><span class="v" id="r0">—</span></div>
       <div class="divider"></div>
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">+ miscelâneo</span></span><span class="v" id="r1">—</span></div>
       <div class="divider"></div>
-      <div class="row"><span class="k"><span class="dot"></span><span class="txt">+ imposto (7%)</span></span><span class="v" id="r2">—</span></div>
-      <div class="divider"></div>
-      <div class="row"><span class="k"><span class="dot"></span><span class="txt" id="deslocLabel">+ deslocamento</span></span><span class="v" id="r2b">—</span></div>
+      <div class="row"><span class="k"><span class="dot"></span><span class="txt" id="impostoLabel">+ imposto (7%)</span></span><span class="v" id="r2">—</span></div>
+      <div class="divider lin-desloc"></div>
+      <div class="row lin-desloc"><span class="k"><span class="dot"></span><span class="txt" id="deslocLabel">+ deslocamento</span></span><span class="v" id="r2b">—</span></div>
       <div class="divider"></div>
       <div class="row"><span class="k"><span class="dot"></span><span class="txt">+ labor</span></span><span class="v" id="r3">—</span></div>
       <div class="divider"></div>
       <div class="row"><span class="k"><span class="dot"></span><span class="txt" id="marginLabel">× margem</span></span><span class="v" id="r4">—</span></div>
-    </div>
+    </div></div>
 
     </div>
 
@@ -827,16 +941,104 @@ body::after{width:360px;height:360px;background:var(--cream);bottom:-140px;left:
 
     </div>
   </div>
-  <div class="foot">ALPHA BREEZY HEATING &amp; COOLING</div>
+  <div class="foot">ALPHA BREEZY HEATING &amp; COOLING <span class="ver">· v1.0 — 18/09/2026</span></div>
 </div>
 
 <script>
 function fmt(n){var s=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return (n<-0.004?'−$':'$')+s;}
+var MULT=false;      // false = imposto 7% + milhas; true = multiplicador unico x1.1
 var TAX_RATE=0.07;   // Broward / Miami-Dade — trocar aqui se mudar o fornecedor
 var CPM=0.85;        // custo por milha da van
 var MODE='pct';
 var ROUND=0;          // 0 = sem arredondar; 50 ou 100 = passo ativo
-var LAST={cash:0,min30:0,cost:0,discCash:0,discCard:0};
+var ORDEM=[];         // ordem em que as etapas foram ativadas
+
+function opAtiva(op){
+  if(op==='round') return ROUND>0;
+  if(op==='desc'){
+    if(MODE==='tgt'){
+      var t=parseFloat(document.getElementById('target').value);
+      return isFinite(t) && t>0;
+    }
+    var d=parseFloat(document.getElementById('disc').value)||0;
+    return d>0.0001;
+  }
+  return false;
+}
+function entraNaOrdem(op){ if(ORDEM.indexOf(op)<0) ORDEM.push(op); }
+function saiDaOrdem(op){ var i=ORDEM.indexOf(op); if(i>=0) ORDEM.splice(i,1); }
+
+function etapaDesconto(entrada){
+  if(MODE==='tgt'){
+    var t=parseFloat(document.getElementById('target').value);
+    if(!isFinite(t) || t<=0) return {valor:entrada, pct:0};
+    return {valor:t, pct: entrada>0 ? (1-t/entrada)*100 : 0};
+  }
+  var d=parseFloat(document.getElementById('disc').value)||0;
+  if(d<0) d=0; if(d>100) d=100;
+  return {valor: entrada*(1-d/100), pct:d};
+}
+function etapaRound(entrada){
+  if(ROUND<=0) return {valor:entrada, passo:0};
+  var a=Math.ceil((entrada-0.005)/ROUND)*ROUND;
+  if(a<entrada) a=entrada;
+  return {valor:a, passo:ROUND};
+}
+function montaCadeia(cash){
+  var v=cash, passos=[];
+  for(var i=0;i<ORDEM.length;i++){
+    var op=ORDEM[i];
+    if(!opAtiva(op)) continue;
+    var r = (op==='desc') ? etapaDesconto(v) : etapaRound(v);
+    if(Math.abs(r.valor - v) < 0.005) continue;         // etapa que nao muda nada: pula
+    passos.push(op==='desc'
+      ? {op:'desc',  de:v, para:r.valor, pct:r.pct}
+      : {op:'round', de:v, para:r.valor, passo:r.passo});
+    v = r.valor;
+  }
+  return {final:v, passos:passos};
+}
+function pctTxt(pp){
+  return pp.toFixed(Math.abs(pp%1)>0.0001 ? 1 : 0) + '%';   // 15% / 12.5%
+}
+function desenhaCadeia(){
+  var g = document.getElementById('cadeiaGrid');
+  var h = '<span class="op base">Valor padrão</span>'
+        + '<span class="dl"></span>'
+        + '<span class="rs">' + fmt(LAST.cash) + '</span>';
+  for(var i=0;i<LAST.passos.length;i++){
+    var pz   = LAST.passos[i];
+    var sobe = pz.para > pz.de;
+    var rot, dl;
+    if(pz.op==='desc'){
+      rot = (sobe ? 'Acréscimo ' : 'Desconto ') + pctTxt(Math.abs(pz.pct));
+    } else {
+      rot = 'Arredondar \u2191$' + pz.passo;
+    }
+    dl = (sobe ? '+ ' : '\u2212 ') + fmt(Math.abs(pz.para - pz.de));
+    h += '<span class="op">' + rot + '</span>'
+       + '<span class="dl">' + dl + '</span>'
+       + '<span class="rs">= ' + fmt(pz.para) + '</span>';
+  }
+  if(LAST.final > LAST.cash + 0.005){
+    h += '<span class="avs">\u26a0 acima do valor padrão</span>';
+  }
+  g.innerHTML = h;
+}
+/* A altura anima no envelope. Medimos o filho, que nunca e limitado pelo envelope,
+   entao nao precisa desligar transicao nem forcar reflow — mudar a altura no meio de
+   uma animacao continua de onde ela estava, sem salto. */
+function mostraBloco(wrap, deveMostrar){
+  var inner = wrap.firstElementChild;
+  var alvo  = deveMostrar ? inner.offsetHeight : 0;
+  if(Math.round(parseFloat(wrap.style.height)||0) !== Math.round(alvo)){
+    wrap.style.height = alvo + 'px';
+  }
+  wrap.classList.toggle('aberto', !!deveMostrar);
+}
+function blocoAberto(wrap){ return wrap.classList.contains('aberto'); }
+
+var LAST={cash:0,min30:0,cost:0,final:0,finalCard:0,passos:[],baseDesc:0};
 function calc(){
   var e=parseFloat(document.getElementById('equip').value)||0;
   var m=parseFloat(document.getElementById('misc').value)||0;
@@ -849,9 +1051,9 @@ function calc(){
 
   var s0=e;
   var s1=s0+m;                      // equipamento + miscelaneo
-  var tax=s1*TAX_RATE;              // imposto pago na compra (7%)
+  var tax=s1*(MULT ? 0.10 : TAX_RATE);   // x1.1 junta imposto e deslocamento num numero so
   var s2=s1+tax;
-  var desloc=miles*trips*CPM;       // deslocamento em dolar
+  var desloc=MULT ? 0 : miles*trips*CPM;
   var s2b=s2+desloc;
   var s3=s2b+l;                     // + labor cobrado
   var cash=s3*mg;
@@ -862,6 +1064,7 @@ function calc(){
   document.getElementById('r2b').textContent=fmt(s2b);
   document.getElementById('r3').textContent=fmt(s3);
   document.getElementById('r4').textContent=fmt(cash);
+  document.getElementById('impostoLabel').textContent = MULT ? '× 1.1' : '+ imposto (7%)';
   document.getElementById('deslocLabel').textContent =
     '+ deslocamento' + (miles>0 ? ' ('+(miles*trips)+' mi)' : '');
   document.getElementById('milesEq').textContent =
@@ -877,90 +1080,96 @@ function calc(){
   var pctLucro = cash>0 ? (lucro/cash*100) : 0;      // margem sobre a venda (antes de desconto)
   document.getElementById('profitPct').textContent = pctLucro.toFixed(1)+'% de lucro';
   document.getElementById('costVal').textContent = fmt(custoReal);
-  /* ---- preco arredondado (acompanha as entradas em tempo real) ---- */
-  var roBox=document.getElementById('roundedBox');
-  if(ROUND>0 && cash>0){
-    var arr=Math.ceil((cash-0.005)/ROUND)*ROUND;      // sempre pra cima, mas nao sobe se ja for redondo
-    if(arr<cash) arr=cash;
-    var roLucro=arr-custoReal;
-    var roPct=arr>0 ? (roLucro/arr*100) : 0;
-    var dif=arr-cash;
-    document.getElementById('roLbl').textContent =
-      'Preço arredondado (↑ $'+ROUND+')' + (dif>0.005 ? '  ·  +'+fmt(dif) : '  ·  já era redondo');
-    document.getElementById('roCash').textContent=fmt(arr);
-    document.getElementById('roCard').textContent=fmt(arr*1.04);
-    var rp=document.getElementById('roProfit');
-    rp.textContent='Lucro '+fmt(roLucro)+'  ('+roPct.toFixed(1)+'%)';
-    rp.className='ro-profit'+(roPct>=30?'':' warn');
-    LAST.roundCash=arr; LAST.roundCard=arr*1.04; LAST.roundStep=ROUND;
-    roBox.style.display='';
-  } else {
-    roBox.style.display='none';
-    LAST.roundCash=0; LAST.roundCard=0; LAST.roundStep=0;
-  }
-
   var dv=document.getElementById('deslocVal');
   dv.textContent = fmt(desloc) + (miles>0 ? '  ('+(miles*trips)+' mi)' : '');
   dv.className = (lucro>0 && desloc > lucro*0.15) ? 'warn' : '';
   var minPrice = custoReal/0.70;                     // menor preco a vista que mantem 30% de lucro
   document.getElementById('minVal').textContent = fmt(minPrice);
-  var maxD = cash>0 ? (1 - minPrice/cash)*100 : 0;  // mesmo limite, so que em %
-  document.getElementById('maxDisc').textContent = maxD>0 ? maxD.toFixed(1)+'%' : 'sem espaço';
   // ---- guarda os valores atuais para os botoes rapidos ----
   LAST.cash = cash; LAST.min30 = minPrice; LAST.cost = custoReal;
   LAST.card = card; LAST.tech = tech; LAST.sys = sys; LAST.lucro = lucro; LAST.pctLucro = pctLucro;
   LAST.equip = e; LAST.misc = m; LAST.labor = l; LAST.margem = mg;
-  LAST.tax = tax; LAST.desloc = desloc; LAST.miles = miles; LAST.trips = trips;
+  LAST.tax = tax; LAST.desloc = desloc; LAST.miles = miles; LAST.trips = trips; LAST.mult = MULT;
 
-  // ---- simulacao: por % de desconto OU por valor final desejado ----
-  var d, precoDesc;
-  if(MODE==='tgt'){
-    var t = parseFloat(document.getElementById('target').value);
-    if(!isFinite(t) || t<=0){ precoDesc = cash; d = 0; }
-    else { precoDesc = t; d = cash>0 ? (1 - t/cash)*100 : 0; }
-  } else {
-    d = parseFloat(document.getElementById('disc').value)||0;
-    if(d<0) d=0; if(d>100) d=100;
-    precoDesc = cash*(1-d/100);
+  // ---- cadeia: desconto e arredondamento na ordem em que foram ativados ----
+  var cad = montaCadeia(cash);
+  LAST.final = cad.final; LAST.finalCard = cad.final*1.04; LAST.passos = cad.passos;
+  var lucroFinal = LAST.final - custoReal;
+  var pctFinal   = LAST.final>0 ? (lucroFinal/LAST.final*100) : 0;
+  var econTot    = cash - LAST.final;
+
+  // base que a etapa de desconto usa: tabela, ou o arredondado se ele vier antes
+  var baseDesc = cash;
+  var achouDesc = false;
+  for(var ip=0; ip<cad.passos.length; ip++){
+    if(cad.passos[ip].op==='desc'){ baseDesc = cad.passos[ip].de; achouDesc=true; break; }
   }
-  var lucroDesc = precoDesc - custoReal;
-  var pctDesc = precoDesc>0 ? (lucroDesc/precoDesc*100) : 0;
+  if(!achouDesc && ROUND>0) baseDesc = etapaRound(cash).valor;
+  LAST.baseDesc = baseDesc;
 
+  // ---- linha da cadeia ----
+  var cx = document.getElementById('cadeiaWrap');
+  if(cad.passos.length){
+    desenhaCadeia();                     // antes do mostraBloco: a animacao mede o conteudo
+    mostraBloco(cx, true);
+  } else {
+    mostraBloco(cx, false);
+  }
+  document.getElementById('invOrdem').classList.toggle('fechado', cad.passos.length<=1);
+
+  // ---- painel do simulador: resultado da cadeia ----
   var po = document.getElementById('discPctOut');
-  var abat = cash - precoDesc;
-  if(d < -0.05){
-    po.textContent = '+'+Math.abs(d).toFixed(1)+'%  ('+fmt(Math.abs(abat))+' acima)';
+  var pctTot = cash>0 ? (econTot/cash*100) : 0;
+  if(econTot < -0.005){
+    po.textContent = '+'+Math.abs(pctTot).toFixed(1)+'%  ('+fmt(Math.abs(econTot))+' acima)';
     po.className = 'ok';
-    document.getElementById('discRowLbl').textContent = 'Acréscimo sobre o cheio';
+    document.getElementById('discRowLbl').textContent = 'Acréscimo sobre o valor padrão';
   } else {
-    po.textContent = (Math.abs(abat)<0.005) ? '0.0%' : d.toFixed(1)+'%  (−'+fmt(abat)+')';
-    po.className = d>=20 ? 'warn' : '';
-    document.getElementById('discRowLbl').textContent = (MODE==='tgt') ? 'Desconto equivalente' : 'Desconto';
+    po.textContent = (Math.abs(econTot)<0.005) ? '0.0%' : pctTot.toFixed(1)+'%  (\u2212'+fmt(econTot)+')';
+    po.className = pctTot>=20 ? 'warn' : '';
+    document.getElementById('discRowLbl').textContent = 'Desconto total vs valor padrão';
   }
-
-  document.getElementById('discPrice').textContent = fmt(precoDesc);
-  document.getElementById('discCard').textContent  = fmt(precoDesc*1.04);
+  document.getElementById('discPrice').textContent = fmt(LAST.final);
+  document.getElementById('discCard').textContent  = fmt(LAST.finalCard);
   document.getElementById('discCost').textContent  = fmt(custoReal);
 
+  // os precos e o lucro do topo seguem o valor final da cadeia
+  document.getElementById('cashVal').textContent = fmt(LAST.final);
+  document.getElementById('cardVal').textContent = fmt(LAST.finalCard);
+  // quando ha alteracao, mostra o valor padrao riscado em cima
+  var mudou = Math.abs(econTot) > 0.005;
+  var cDe = document.getElementById('cashDe'), kDe = document.getElementById('cardDe');
+  cDe.textContent = mudou ? fmt(cash) : '';
+  kDe.textContent = mudou ? fmt(card) : '';
+  cDe.className = 'val-de'+(mudou?' on':'');
+  kDe.className = 'val-de'+(mudou?' on':'');
+  document.getElementById('profitVal').textContent = fmt(lucroFinal);
+  document.getElementById('profitPct').textContent = pctFinal.toFixed(1)+'% de lucro';
+  LAST.lucro = lucroFinal; LAST.pctLucro = pctFinal;
+
   var dp = document.getElementById('discProfit');
-  if(lucroDesc < 0){
-    dp.textContent = fmt(lucroDesc)+'  (PREJUÍZO)';
+  if(lucroFinal < 0){
+    dp.textContent = fmt(lucroFinal)+'  (PREJUÍZO)';
     dp.className = 'warn';
   } else {
-    dp.textContent = fmt(lucroDesc)+'  ('+pctDesc.toFixed(1)+'%)';
-    dp.className = pctDesc>=30 ? 'ok' : 'warn';
+    dp.textContent = fmt(lucroFinal)+'  ('+pctFinal.toFixed(1)+'%)';
+    dp.className = pctFinal>=30 ? 'ok' : 'warn';
   }
-  LAST.discCash = precoDesc; LAST.discCard = precoDesc*1.04;
 
-  // ---- 80/20 acompanha o preco efetivo (com desconto, se houver) ----
+  // ---- guardrails ----
+  document.getElementById('minVal').className = (LAST.final < minPrice-0.005) ? 'warn' : '';
+  var maxD = baseDesc>0 ? (1 - minPrice/baseDesc)*100 : 0;
+  document.getElementById('maxDisc').textContent = maxD>0 ? maxD.toFixed(1)+'%' : 'sem espaço';
+
+  // ---- 80/20 sobre o valor final ----
   var sp=parseFloat(document.getElementById('splitPct').value);
   if(!isFinite(sp)||sp<0) sp=0; if(sp>100) sp=100;
   document.getElementById('splitPct2').textContent=(100-sp)+'%';
-  document.getElementById('p80').textContent=fmt(precoDesc*sp/100);
-  document.getElementById('p20').textContent=fmt(precoDesc*(100-sp)/100);
+  document.getElementById('p80').textContent=fmt(LAST.final*sp/100);
+  document.getElementById('p20').textContent=fmt(LAST.final*(100-sp)/100);
   var sufixo = 'à vista';
-  if(precoDesc < cash-0.005) sufixo = 'com desconto';
-  else if(precoDesc > cash+0.005) sufixo = 'ajustado';
+  if(LAST.final < cash-0.005) sufixo = 'final';
+  else if(LAST.final > cash+0.005) sufixo = 'ajustado';
   document.getElementById('splitCap').textContent = sp+'% / '+(100-sp)+'% do valor '+sufixo;
 
   var pct=Math.round((mg-1)*100);
@@ -980,6 +1189,19 @@ function updateBrand(){
 document.getElementById('brand').addEventListener('change',updateBrand);
 document.getElementById('brandOther').addEventListener('input',updateBrand);
 ['equip','misc','labor','margin','tech','miles','trips'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+document.querySelectorAll('.sbtn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var f=btn.getAttribute('data-f');
+    MULT = (f==='mult');
+    document.querySelectorAll('.sbtn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-f')===f);
+    });
+    document.getElementById('segFormula').classList.toggle('dir', MULT);
+    document.body.classList.toggle('modo-mult', MULT);
+    calc();
+  });
+});
+
 var ZONA_MILHAS={'Local':10,'Broward':30,'Miami-Dade':70,'Palm Beach':80,'Homestead':130};
 document.getElementById('zone').addEventListener('change',function(){
   var v=ZONA_MILHAS[this.value];
@@ -988,10 +1210,16 @@ document.getElementById('zone').addEventListener('change',function(){
 });
 
 document.getElementById('detailToggle').addEventListener('click',function(){
-  var pn=document.getElementById('stepsPanel');
-  var aberto = pn.style.display !== 'none';
-  pn.style.display = aberto ? 'none' : '';
+  var w=document.getElementById('stepsWrap');
+  var aberto = blocoAberto(w);
+  mostraBloco(w, !aberto);
   this.textContent = aberto ? 'Ver detalhamento' : 'Esconder detalhamento';
+});
+window.addEventListener('resize',function(){          // largura muda => altura do conteudo muda
+  var w=document.getElementById('stepsWrap');
+  if(blocoAberto(w)) mostraBloco(w, true);
+  var c=document.getElementById('cadeiaWrap');
+  if(blocoAberto(c)) mostraBloco(c, true);
 });
 
 var TECH_PADRAO={'Mini Split':600,'Water Source':1050,'Split System':1050};
@@ -1000,7 +1228,12 @@ document.getElementById('system').addEventListener('change',function(){
   if(v!==undefined) document.getElementById('tech').value=v;   // sobrescreva a mao se precisar
   calc();
 });
-document.getElementById('disc').addEventListener('input',calc);
+function toqueDesc(){
+  if(opAtiva('desc')) entraNaOrdem('desc'); else saiDaOrdem('desc');
+  calc();
+}
+document.getElementById('disc').addEventListener('input',toqueDesc);
+document.getElementById('invOrdem').addEventListener('click',function(){ ORDEM.reverse(); calc(); });
 document.getElementById('splitPct').addEventListener('input',calc);
 
 /* ---- capacidade: kBTU <-> tonelagem (1 ton = 12k) ---- */
@@ -1034,6 +1267,7 @@ document.querySelectorAll('.ubtn').forEach(function(btn){
     document.querySelectorAll('.ubtn').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-u')===u);
     });
+    document.querySelector('.cap-unit').classList.toggle('dir', u==='ton');
     capAtualiza();
   });
 });
@@ -1046,23 +1280,26 @@ document.querySelectorAll('.rbtn').forEach(function(btn){
     document.querySelectorAll('.rbtn').forEach(function(b){
       b.classList.toggle('active', parseFloat(b.getAttribute('data-r'))===ROUND);
     });
+    if(ROUND>0) entraNaOrdem('round'); else saiDaOrdem('round');
     calc();
   });
 });
-document.getElementById('roundClear').addEventListener('click',function(){
+document.getElementById('limparCadeia').addEventListener('click',function(){
   ROUND=0;
   document.querySelectorAll('.rbtn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('disc').value='0';
+  document.getElementById('target').value='';
+  ORDEM=[];
   calc();
 });
-miniCopy('copyRoCash','copyRoCashLabel',function(){return LAST.roundCash;});
-miniCopy('copyRoCard','copyRoCardLabel',function(){return LAST.roundCard;});
-document.getElementById('target').addEventListener('input',calc);
+document.getElementById('target').addEventListener('input',toqueDesc);
 
 function setMode(m){
   MODE = m;
   document.querySelectorAll('.mbtn').forEach(function(b){
     b.classList.toggle('active', b.getAttribute('data-m')===m);
   });
+  document.querySelector('.disc-mode').classList.toggle('dir', m==='tgt');
   var isTgt = (m==='tgt');
   document.getElementById('fieldPct').style.display = isTgt?'none':'block';
   document.getElementById('fieldTgt').style.display = isTgt?'block':'none';
@@ -1073,9 +1310,9 @@ function setMode(m){
     : '% de desconto sobre o preço à vista';
   if(isTgt){
     var tf = document.getElementById('target');
-    if(!tf.value) tf.value = Math.round(LAST.cash);   // parte do preco cheio atual
+    if(!tf.value) tf.value = (LAST.baseDesc||LAST.cash).toFixed(2);  // exato, pra nao criar etapa fantasma
   }
-  calc();
+  toqueDesc();
 }
 document.querySelectorAll('.mbtn').forEach(function(b){
   b.addEventListener('click',function(){ setMode(b.getAttribute('data-m')); });
@@ -1084,17 +1321,18 @@ document.querySelectorAll('.mbtn').forEach(function(b){
 document.querySelectorAll('#quickPct .qbtn').forEach(function(btn){
   btn.addEventListener('click',function(){
     document.getElementById('disc').value=btn.getAttribute('data-d');
-    calc();
+    toqueDesc();
   });
 });
 document.querySelectorAll('#quickTgt .qbtn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var k=btn.getAttribute('data-t'), v;
-    if(k==='r100')      v = Math.floor(LAST.cash/100)*100;
-    else if(k==='r500') v = Math.floor(LAST.cash/500)*500;
+    var bd = LAST.baseDesc||LAST.cash;
+    if(k==='r100')      v = Math.floor(bd/100)*100;
+    else if(k==='r500') v = Math.floor(bd/500)*500;
     else                v = Math.ceil(LAST.min30/10)*10;   // arredonda p/ cima: nunca cai abaixo de 30%
     document.getElementById('target').value = v;
-    calc();
+    toqueDesc();
   });
 });
 
@@ -1178,10 +1416,8 @@ function desenhaJPG(ctx, W, medir, limpo){
 
   /* ============ VERSAO DO CLIENTE: destaque no valor que ele paga ============ */
   if(limpo){
-    // preco efetivo: arredondado manda, depois desconto, depois o cheio
-    var fin=LAST.cash, finCard=LAST.card;
-    if(LAST.roundStep){ fin=LAST.roundCash; finCard=LAST.roundCard; }
-    else if(Math.abs(LAST.cash-LAST.discCash)>0.005){ fin=LAST.discCash; finCard=LAST.discCard; }
+    // preco efetivo: resultado da cadeia (desconto e/ou arredondamento, na ordem)
+    var fin=LAST.final, finCard=LAST.finalCard;
     var econ=LAST.cash-fin;                       // positivo = cliente paga menos que a tabela
     var pctEcon=LAST.cash>0 ? (econ/LAST.cash*100) : 0;
     var temDesc = econ>0.005;
@@ -1287,8 +1523,12 @@ function desenhaJPG(ctx, W, medir, limpo){
   linha('Valor do equipamento',moeda(LAST.equip));
   linha('Miscelâneo',moeda(LAST.misc));
   linha('Labor cobrado',moeda(LAST.labor));
-  linha('Imposto (7%)',moeda(LAST.tax));
-  linha('Deslocamento',moeda(LAST.desloc)+(LAST.miles>0?'  ('+(LAST.miles*LAST.trips)+' mi)':''));
+  if(LAST.mult){
+    linha('Multiplicador (x1.1)',moeda(LAST.tax));
+  } else {
+    linha('Imposto (7%)',moeda(LAST.tax));
+    linha('Deslocamento',moeda(LAST.desloc)+(LAST.miles>0?'  ('+(LAST.miles*LAST.trips)+' mi)':''));
+  }
   linha('Margem de lucro','x'+LAST.margem.toFixed(2)+'  ('+Math.round((LAST.margem-1)*100)+'%)');
   linha('Custo do técnico',moeda(LAST.tech));
   separador();
@@ -1300,33 +1540,47 @@ function desenhaJPG(ctx, W, medir, limpo){
     ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font=F(17,700); ctx.textAlign='left';
     ctx.fillText('ZELLE · CHECK · CASH',P+24,y+38);
     ctx.fillStyle='#fff'; ctx.font=F(40,800);
-    ctx.fillText(moeda(LAST.cash),P+24,y+88);
+    ctx.fillText(moeda(LAST.final),P+24,y+88);
 
     ctx.fillStyle='#FFFBF0'; rrect(P+bw+20,y,bw,bh,18); ctx.fill();
     ctx.strokeStyle=C.gold; ctx.lineWidth=3; rrect(P+bw+20,y,bw,bh,18); ctx.stroke();
     ctx.fillStyle=C.muted; ctx.font=F(17,700);
     ctx.fillText('CARTÃO (+4%)',P+bw+44,y+38);
     ctx.fillStyle=C.teald; ctx.font=F(40,800);
-    ctx.fillText(moeda(LAST.card),P+bw+44,y+88);
+    ctx.fillText(moeda(LAST.finalCard),P+bw+44,y+88);
   }
   y+=bh+26;
 
-  /* ---- arredondado (so se estiver ativo) ---- */
-  if(LAST.roundStep){
-    var rl=LAST.roundCash-LAST.cost;
-    var rpc=LAST.roundCash>0?(rl/LAST.roundCash*100):0;
+  /* ---- cadeia do preco final (so se houver etapa ativa) ---- */
+  if(LAST.passos && LAST.passos.length){
+    var lf=LAST.final-LAST.cost;
+    var pfc=LAST.final>0?(lf/LAST.final*100):0;
+    var linhas=[];
+    linhas.push(['Valor padrão', moeda(LAST.cash)]);
+    for(var ic=0; ic<LAST.passos.length; ic++){
+      var pc=LAST.passos[ic];
+      var sobeC = pc.para > pc.de;
+      var dlC   = (sobeC?'+ ':'\u2212 ') + moeda(Math.abs(pc.para - pc.de));
+      var rotC  = (pc.op==='desc'
+                    ? (sobeC?'Acréscimo ':'Desconto ') + pctTxt(Math.abs(pc.pct))
+                    : 'Arredondado \u2191$' + pc.passo) + '  (' + dlC + ')';
+      linhas.push([rotC, moeda(pc.para)]);
+    }
+    var ch2=48+linhas.length*34;
     if(!medir){
-      ctx.fillStyle='#F2F8F8'; rrect(P,y,W-P*2,88,16); ctx.fill();
-      ctx.strokeStyle='#dcebeb'; ctx.lineWidth=2; rrect(P,y,W-P*2,88,16); ctx.stroke();
+      ctx.fillStyle='#F2F8F8'; rrect(P,y,W-P*2,ch2,16); ctx.fill();
+      ctx.strokeStyle='#dcebeb'; ctx.lineWidth=2; rrect(P,y,W-P*2,ch2,16); ctx.stroke();
       ctx.textAlign='left'; ctx.fillStyle=C.teal; ctx.font=F(16,800);
       ctx.save(); ctx.letterSpacing='2px';
-      ctx.fillText('ARREDONDADO PARA CIMA ($'+LAST.roundStep+')',P+24,y+30); ctx.restore();
-      ctx.fillStyle=C.teald; ctx.font=F(26,800);
-      ctx.fillText(moeda(LAST.roundCash),P+24,y+68);
-      ctx.textAlign='right'; ctx.fillStyle=C.muted; ctx.font=F(19,700);
-      ctx.fillText('cartão '+moeda(LAST.roundCard)+'  ·  lucro '+moeda(rl)+' ('+rpc.toFixed(1)+'%)',W-P-24,y+68);
+      ctx.fillText('PREÇO FINAL',P+24,y+30); ctx.restore();
+      for(var il=0; il<linhas.length; il++){
+        ctx.textAlign='left'; ctx.fillStyle=C.muted; ctx.font=F(20,600);
+        ctx.fillText(linhas[il][0],P+24,y+62+il*34);
+        ctx.textAlign='right'; ctx.fillStyle=C.ink; ctx.font=F(21,700);
+        ctx.fillText(linhas[il][1],W-P-24,y+62+il*34);
+      }
     }
-    y+=88+26;
+    y+=ch2+26;
   }
 
   /* ---- lucro ---- */
@@ -1347,24 +1601,6 @@ function desenhaJPG(ctx, W, medir, limpo){
   linha('Preço mín. p/ 30% de lucro',document.getElementById('minVal').textContent,C.teald);
   P=pad;
   y=ySalvo+lh+26;
-
-  /* ---- desconto (so aparece se tiver) ---- */
-  if(Math.abs(LAST.cash-LAST.discCash)>0.005){
-    var dpct=LAST.cash>0?(1-LAST.discCash/LAST.cash)*100:0;
-    var dl=LAST.discCash-LAST.cost, dpl=LAST.discCash>0?(dl/LAST.discCash*100):0;
-    var dh=196;
-    if(!medir){
-      ctx.fillStyle='#F2F8F8'; rrect(P,y,W-P*2,dh,18); ctx.fill();
-      ctx.strokeStyle=C.line; ctx.lineWidth=2; rrect(P,y,W-P*2,dh,18); ctx.stroke();
-    }
-    var yS=y; y+=22; var pd=P; P=P+26;
-    titulo(dpct<0 ? 'Com acréscimo de '+Math.abs(dpct).toFixed(1)+'%'
-                  : 'Com desconto de '+dpct.toFixed(1)+'%');
-    linha('À vista',moeda(LAST.discCash),C.teald,800);
-    linha('Cartão',moeda(LAST.discCard),C.teald,800);
-    linha('Lucro',moeda(dl)+'  ('+dpl.toFixed(1)+'%)',dpl>=30?'#1a7f4b':'#b06b00',800);
-    P=pd; y=yS+dh+26;
-  }
 
   /* ---- divisao ---- */
   var sp=parseFloat(document.getElementById('splitPct').value)||0;
@@ -1432,9 +1668,7 @@ document.getElementById('copyClienteBtn').addEventListener('click',function(){
 });
 
 function resumoLimpo(){
-  var fin=LAST.cash, finCard=LAST.card;
-  if(LAST.roundStep){ fin=LAST.roundCash; finCard=LAST.roundCard; }
-  else if(Math.abs(LAST.cash-LAST.discCash)>0.005){ fin=LAST.discCash; finCard=LAST.discCard; }
+  var fin=LAST.final, finCard=LAST.finalCard;
   var econ=LAST.cash-fin;
   var sp2=parseFloat(document.getElementById('splitPct').value); if(!isFinite(sp2)) sp2=80;
 
@@ -1469,35 +1703,36 @@ function resumo(){
     'Valor do equipamento: ' + fmt(LAST.equip),
     'Miscelâneo: ' + fmt(LAST.misc),
     'Labor cobrado: ' + fmt(LAST.labor),
-    'Imposto (7%): ' + fmt(LAST.tax),
-    'Deslocamento: ' + fmt(LAST.desloc) + (LAST.miles>0 ? '  ('+(LAST.miles*LAST.trips)+' mi)' : ''),
+    (LAST.mult ? 'Multiplicador (x1.1): ' + fmt(LAST.tax)
+               : 'Imposto (7%): ' + fmt(LAST.tax)),
+    (LAST.mult ? null
+               : 'Deslocamento: ' + fmt(LAST.desloc) + (LAST.miles>0 ? '  ('+(LAST.miles*LAST.trips)+' mi)' : '')),
     'Margem de lucro: x' + LAST.margem.toFixed(2) + ' (' + Math.round((LAST.margem-1)*100) + '%)',
     '',
-    'Venda Zelle/Check/Cash: ' + fmt(LAST.cash),
-    'Venda cartão: ' + fmt(LAST.card),
+    'Venda Zelle/Check/Cash: ' + fmt(LAST.final),
+    'Venda cartão: ' + fmt(LAST.finalCard),
     '',
     'Custo de labor (técnico): ' + fmt(LAST.tech),
     'Custo final: ' + fmt(LAST.cost),
     'Lucro total: ' + fmt(LAST.lucro) + ' (' + LAST.pctLucro.toFixed(1) + '%)'
-  ];
-  if(LAST.roundStep){
-    var rl = LAST.roundCash - LAST.cost;
+  ].filter(function(x){ return x !== null; });
+  if(LAST.passos && LAST.passos.length){
+    var lf = LAST.final - LAST.cost;
+    var pf = LAST.final>0 ? (lf/LAST.final*100) : 0;
     L.push('');
-    L.push('--- Arredondado (para cima, $'+LAST.roundStep+') ---');
-    L.push('À vista: ' + fmt(LAST.roundCash));
-    L.push('Cartão: ' + fmt(LAST.roundCard));
-    L.push('Lucro: ' + fmt(rl) + ' (' + (LAST.roundCash>0?(rl/LAST.roundCash*100).toFixed(1):'0') + '%)');
-  }
-  if(Math.abs(LAST.cash - LAST.discCash) > 0.005){
-    var dpct = LAST.cash>0 ? (1 - LAST.discCash/LAST.cash)*100 : 0;
-    var dl = LAST.discCash - LAST.cost;
-    var dpl = LAST.discCash>0 ? (dl/LAST.discCash*100) : 0;
-    L.push('');
-    L.push(dpct < 0 ? '--- Com acréscimo de ' + Math.abs(dpct).toFixed(1) + '% ---'
-                    : '--- Com desconto de ' + dpct.toFixed(1) + '% ---');
-    L.push('À vista: ' + fmt(LAST.discCash));
-    L.push('Cartão: ' + fmt(LAST.discCard));
-    L.push('Lucro: ' + fmt(dl) + ' (' + dpl.toFixed(1) + '%)');
+    L.push('--- Preço final ---');
+    L.push('Valor padrão: ' + fmt(LAST.cash));
+    for(var ix=0; ix<LAST.passos.length; ix++){
+      var pp=LAST.passos[ix];
+      var sobeR = pp.para > pp.de;
+      var dlR   = (sobeR?'+ ':'\u2212 ') + fmt(Math.abs(pp.para - pp.de));
+      L.push((pp.op==='desc'
+               ? (sobeR?'Acréscimo ':'Desconto ') + pctTxt(Math.abs(pp.pct))
+               : 'Arredondado \u2191$' + pp.passo) + ' (' + dlR + '): ' + fmt(pp.para));
+    }
+    L.push('À vista: ' + fmt(LAST.final));
+    L.push('Cartão: ' + fmt(LAST.finalCard));
+    L.push('Lucro: ' + fmt(lf) + ' (' + pf.toFixed(1) + '%)');
   }
   return L.join('\n');
 }
@@ -1507,17 +1742,17 @@ document.getElementById('copyFullBtn').addEventListener('click',function(){
     lab.textContent='Copiado!'; setTimeout(function(){lab.textContent=o;},1500);
   });
 });
-miniCopy('copyDiscCash','copyDiscCashLabel',function(){return LAST.discCash;});
-miniCopy('copyDiscCard','copyDiscCardLabel',function(){return LAST.discCard;});
+miniCopy('copyDiscCash','copyDiscCashLabel',function(){return LAST.final;});
+miniCopy('copyDiscCard','copyDiscCardLabel',function(){return LAST.finalCard;});
 document.getElementById('copyCashBtn').addEventListener('click',function(){
-  var v=document.getElementById('cashVal').textContent;
+  var v=fmt(LAST.final);                       // valor final da cadeia, nao a tabela
   navigator.clipboard.writeText(v).then(function(){
     var lab=document.getElementById('copyCashLabel'); var o=lab.textContent;
     lab.textContent='Copiado!'; setTimeout(function(){lab.textContent=o;},1500);
   });
 });
 document.getElementById('copyCardBtn').addEventListener('click',function(){
-  var v=document.getElementById('cardVal').textContent;
+  var v=fmt(LAST.finalCard);                   // valor final da cadeia, nao a tabela
   navigator.clipboard.writeText(v).then(function(){
     var lab=document.getElementById('copyCardLabel'); var o=lab.textContent;
     lab.textContent='Copiado!'; setTimeout(function(){lab.textContent=o;},1500);
